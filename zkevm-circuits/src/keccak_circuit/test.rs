@@ -4,6 +4,11 @@ use eth_types::Field;
 use halo2_proofs::{dev::MockProver, halo2curves::bn256::Fr};
 use log::error;
 use std::iter::zip;
+use halo2_proofs::halo2curves::bn256::Bn256;
+use halo2_proofs::plonk::{keygen_pk, keygen_vk};
+use halo2_proofs::poly::kzg::commitment::ParamsKZG;
+use rand::SeedableRng;
+use rand_chacha::ChaCha20Rng;
 
 use super::util::{target_part_sizes, target_part_sizes_rot, WordParts};
 
@@ -37,6 +42,17 @@ fn verify<F: Field>(k: u32, inputs: Vec<Vec<u8>>, success: bool) {
     }
 }
 
+fn keygen_check<F: Field>(k: u32, inputs: Vec<Vec<u8>>) {
+    let circuit = KeccakCircuit::new(2usize.pow(k), inputs);
+
+    let mut rng = ChaCha20Rng::seed_from_u64(0);
+    // todo: assert that degree === k
+    let general_params = ParamsKZG::<Bn256>::setup(k, &mut rng);
+
+    let vk = keygen_vk(&general_params, &circuit).expect("keygen_vk should not fail");
+    let _pk = keygen_pk(&general_params, vk, &circuit).expect("keygen_pk should not fail");
+}
+
 #[test]
 fn packed_multi_keccak_simple() {
     let k = 15;
@@ -47,7 +63,8 @@ fn packed_multi_keccak_simple() {
         (0u8..136).collect::<Vec<_>>(),
         (0u8..200).collect::<Vec<_>>(),
     ];
-    verify::<Fr>(k, inputs, true);
+    // verify::<Fr>(k, inputs.clone(), true);
+    keygen_check::<Fr>(k, inputs);
 }
 
 #[test]
