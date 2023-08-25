@@ -1,3 +1,4 @@
+#![deny(unused_crate_dependencies)]
 //! # ZKEVM-Gadgets
 //!
 //! A collection of reusable gadgets for the zk_evm circuits.

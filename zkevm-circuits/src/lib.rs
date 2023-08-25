@@ -27,7 +27,6 @@ pub(crate) mod exp_circuit;
 pub(crate) mod keccak_circuit;
 pub(crate) mod table;
 
-pub(crate) mod instance;
 pub(crate) mod util;
 pub(crate) mod witness;
 

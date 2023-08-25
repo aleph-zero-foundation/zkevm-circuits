@@ -1,6 +1,6 @@
 use crate::{
     evm_circuit::{
-        step::ExecutionState, table::Table, util::constraint_builder::EVMConstraintBuilder,
+        step::ExecutionState,  util::constraint_builder::EVMConstraintBuilder,
     },
     util::cell_manager::CellType,
 };
@@ -37,79 +37,6 @@ impl Instrument {
         self.states.push((execution_state, sizes));
     }
 
-    /// Dissasembles the instrumentation data and returns a collection of
-    /// `ExecStateReport`s. One for each EVM `ExecutionState`.
-    pub fn analyze(&self) -> Vec<ExecStateReport> {
-        let mut report_collection = vec![];
-        for (state, sizes) in &self.states {
-            // Create a state report
-            let mut report = ExecStateReport::from(state);
-            // Compute max_height required for any kind of CellType for the current
-            // `ExecutionState`.
-            let top_height: usize = sizes.iter().map(|(_, (_, h, _))| *h).max().unwrap();
-
-            // Obtain `ExecutionState` metrics per column type.
-            for (cell_type, (width, _, cells)) in sizes {
-                let unused_cells = width * top_height - cells;
-                let total_available_cells = width * top_height;
-                let utilization =
-                    ((*cells as f64) / (*width as f64 * top_height as f64) * 100f64).round();
-
-                let data_entry = StateReportRow {
-                    available_cells: total_available_cells,
-                    unused_cells,
-                    used_cells: *cells,
-                    top_height,
-                    used_columns: cells / top_height,
-                    utilization,
-                };
-
-                match cell_type {
-                    CellType::StoragePhase1 => {
-                        report.storage_1 = data_entry;
-                    }
-                    CellType::StoragePhase2 => {
-                        report.storage_2 = data_entry;
-                    }
-                    CellType::StoragePermutation => {
-                        report.storage_perm = data_entry;
-                    }
-                    CellType::Lookup(Table::U8) => {
-                        report.u8_lookup = data_entry;
-                    }
-                    CellType::Lookup(Table::U16) => {
-                        report.u16_lookup = data_entry;
-                    }
-                    CellType::Lookup(Table::Fixed) => {
-                        report.fixed_table = data_entry;
-                    }
-                    CellType::Lookup(Table::Tx) => {
-                        report.tx_table = data_entry;
-                    }
-                    CellType::Lookup(Table::Rw) => {
-                        report.rw_table = data_entry;
-                    }
-                    CellType::Lookup(Table::Bytecode) => {
-                        report.bytecode_table = data_entry;
-                    }
-                    CellType::Lookup(Table::Block) => {
-                        report.block_table = data_entry;
-                    }
-                    CellType::Lookup(Table::Copy) => {
-                        report.copy_table = data_entry;
-                    }
-                    CellType::Lookup(Table::Keccak) => {
-                        report.keccak_table = data_entry;
-                    }
-                    CellType::Lookup(Table::Exp) => {
-                        report.exp_table = data_entry;
-                    }
-                }
-            }
-            report_collection.push(report);
-        }
-        report_collection
-    }
 }
 
 /// Struct which contains a Cost/ColumnType report for a particular EVM

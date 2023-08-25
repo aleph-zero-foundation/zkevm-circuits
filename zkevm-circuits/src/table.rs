@@ -6,7 +6,7 @@ use crate::{
     impl_expr,
     util::{
         build_tx_log_address, keccak,
-        word::{self, Word},
+        word::{self},
         Challenges,
     },
     witness::{Block, BlockContext, Rw, RwMap, RwRow, Transaction},

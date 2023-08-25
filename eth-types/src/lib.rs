@@ -1,3 +1,4 @@
+#![deny(unused_crate_dependencies)]
 //! Ethereum and Evm types used to deserialize responses from web3 / geth.
 
 #![cfg_attr(docsrs, feature(doc_cfg))]

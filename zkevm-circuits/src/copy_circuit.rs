@@ -765,15 +765,6 @@ pub struct CopyCircuit<F: Field> {
 }
 
 impl<F: Field> CopyCircuit<F> {
-    /// Return a new CopyCircuit
-    pub fn new(copy_events: Vec<CopyEvent>, max_copy_rows: usize) -> Self {
-        Self {
-            copy_events,
-            max_copy_rows,
-            _marker: PhantomData::default(),
-            external_data: ExternalData::default(),
-        }
-    }
 
     /// Return a new CopyCircuit with external data
     pub fn new_with_external_data(
@@ -789,16 +780,6 @@ impl<F: Field> CopyCircuit<F> {
         }
     }
 
-    /// Return a new CopyCircuit from a block without the external data required
-    /// to assign lookup tables.  This constructor is only suitable to be
-    /// used by the SuperCircuit, which already assigns the external lookup
-    /// tables.
-    pub fn new_from_block_no_external(block: &witness::Block<F>) -> Self {
-        Self::new(
-            block.copy_events.clone(),
-            block.circuits_params.max_copy_rows,
-        )
-    }
 }
 
 impl<F: Field> SubCircuit<F> for CopyCircuit<F> {

@@ -110,10 +110,6 @@ impl<F: Field> Challenges<Expression<F>> {
         Self::powers_of(self.keccak_input.clone())
     }
 
-    /// Returns powers of randomness for lookups
-    pub fn lookup_input_powers_of_randomness<const S: usize>(&self) -> [Expression<F>; S] {
-        Self::powers_of(self.lookup_input.clone())
-    }
 }
 
 pub(crate) fn build_tx_log_address(index: u64, field_tag: TxLogFieldTag, log_id: u64) -> Address {
@@ -172,11 +168,6 @@ pub trait SubCircuitConfig<F: Field> {
 
     /// Type constructor
     fn new(meta: &mut ConstraintSystem<F>, args: Self::ConfigArgs) -> Self;
-}
-
-/// Ceiling of log_2(n)
-pub fn log2_ceil(n: usize) -> u32 {
-    u32::BITS - (n as u32).leading_zeros() - (n & (n - 1) == 0) as u32
 }
 
 pub(crate) fn keccak(msg: &[u8]) -> Word {

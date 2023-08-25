@@ -1,15 +1,11 @@
 use super::{ExecStep, Rw, RwMap, Transaction};
 use crate::{
-    evm_circuit::{detect_fixed_table_tags, EvmCircuit},
-    exp_circuit::param::OFFSET_INCREMENT,
-    instance::public_data_convert,
     table::BlockContextFieldTag,
-    util::{log2_ceil, word, SubCircuit},
+    util::{word},
 };
 use bus_mapping::{
     circuit_input_builder::{self, CopyEvent, ExpEvent, FixedCParams},
     state_db::CodeDB,
-    Error,
 };
 use eth_types::{Address, Field, ToScalar, Word};
 use halo2_proofs::circuit::Value;

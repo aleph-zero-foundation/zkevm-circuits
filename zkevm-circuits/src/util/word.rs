@@ -3,13 +3,12 @@
 // - Limbs: An EVN word is 256 bits. Limbs N means split 256 into N limb. For example, N = 4, each
 //   limb is 256/4 = 64 bits
 
-use bus_mapping::state_db::CodeDB;
+
 use eth_types::{Field, ToLittleEndian, H160, H256};
-use gadgets::util::{not, or, Expr};
+use gadgets::util::{Expr};
 use halo2_proofs::{
     circuit::{AssignedCell, Region, Value},
-    plonk::{Advice, Column, Error, Expression, VirtualCells},
-    poly::Rotation,
+    plonk::{Advice, Column, Error, Expression, },
 };
 use itertools::Itertools;
 
@@ -39,28 +38,6 @@ impl<T, const N: usize> WordLimbs<T, N> {
     /// Constructor
     pub fn new(limbs: [T; N]) -> Self {
         Self { limbs }
-    }
-    /// The number of limbs
-    pub fn n() -> usize {
-        N
-    }
-}
-
-impl<const N: usize> WordLimbs<Column<Advice>, N> {
-    /// Query advice of WordLibs of columns advice
-    pub fn query_advice<F: Field>(
-        &self,
-        meta: &mut VirtualCells<F>,
-        at: Rotation,
-    ) -> WordLimbs<Expression<F>, N> {
-        WordLimbs::new(self.limbs.map(|column| meta.query_advice(column, at)))
-    }
-}
-
-impl<const N: usize> WordLimbs<u8, N> {
-    /// Convert WordLimbs of u8 to WordLimbs of expressions
-    pub fn to_expr<F: Field>(&self) -> WordLimbs<Expression<F>, N> {
-        WordLimbs::new(self.limbs.map(|v| Expression::Constant(F::from(v as u64))))
     }
 }
 
@@ -187,13 +164,6 @@ impl<F: Field, const N: usize> WordExpr<F> for WordLimbs<Cell<F>, N> {
     }
 }
 
-impl<F: Field, const N: usize> WordLimbs<F, N> {
-    /// Check if zero
-    pub fn is_zero_vartime(&self) -> bool {
-        self.limbs.iter().all(|limb| limb.is_zero_vartime())
-    }
-}
-
 /// `Word`, special alias for Word2.
 #[derive(Clone, Debug, Copy, Default)]
 pub struct Word<T>(Word2<T>);
@@ -210,10 +180,6 @@ impl<T: Clone> Word<T> {
     /// the low 128 bits limb
     pub fn lo(&self) -> T {
         self.0.limbs[0].clone()
-    }
-    /// number of limbs
-    pub fn n() -> usize {
-        2
     }
     /// word to low and high 128 bits
     pub fn to_lo_hi(&self) -> (T, T) {
@@ -332,17 +298,6 @@ impl<F: Field> Word<Value<F>> {
     }
 }
 
-impl Word<Column<Advice>> {
-    /// Query advice of Word of columns advice
-    pub fn query_advice<F: Field>(
-        &self,
-        meta: &mut VirtualCells<F>,
-        at: Rotation,
-    ) -> Word<Expression<F>> {
-        self.0.query_advice(meta, at).to_word()
-    }
-}
-
 impl<F: Field> WordExpr<F> for Word<Cell<F>> {
     fn to_word(&self) -> Word<Expression<F>> {
         self.word_expr().to_word()
@@ -422,20 +377,6 @@ impl<F: Field, const N1: usize> WordLimbs<Expression<F>, N1> {
             .try_into()
             .unwrap();
         WordLimbs::<Expression<F>, N2>::new(limbs)
-    }
-
-    /// Equality expression
-    // TODO static assertion. wordaround https://github.com/nvzqz/static-assertions-rs/issues/40
-    pub fn eq<const N2: usize>(&self, others: &WordLimbs<Expression<F>, N2>) -> Expression<F> {
-        assert_eq!(N1 % N2, 0);
-        not::expr(or::expr(
-            self.limbs
-                .chunks(N1 / N2)
-                .map(|chunk| from_bytes::expr(chunk))
-                .zip(others.limbs.clone())
-                .map(|(expr1, expr2)| expr1 - expr2)
-                .collect_vec(),
-        ))
     }
 }
 

@@ -548,15 +548,6 @@ impl From<OpcodeId> for ResponsibleOp {
     }
 }
 
-impl ResponsibleOp {
-    /// Get the opcode
-    pub fn opcode(&self) -> OpcodeId {
-        *match self {
-            ResponsibleOp::Op(opcode) => opcode,
-            ResponsibleOp::InvalidStackPtr(opcode, _) => opcode,
-        }
-    }
-}
 
 /// Dynamic selector that generates expressions of degree 2 to select from N
 /// possible targets using N/2 + 1 cells.

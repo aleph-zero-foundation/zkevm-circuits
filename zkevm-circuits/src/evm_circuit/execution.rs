@@ -232,7 +232,6 @@ pub struct ExecutionConfig<F> {
     pub(crate) height_map: HashMap<ExecutionState, usize>,
     stored_expressions_map: HashMap<ExecutionState, Vec<StoredExpression<F>>>,
     debug_expressions_map: HashMap<ExecutionState, Vec<(String, Expression<F>)>>,
-    instrument: Instrument,
     // internal state gadgets
     begin_tx_gadget: Box<BeginTxGadget<F>>,
     end_block_gadget: Box<EndBlockGadget<F>>,
@@ -590,7 +589,6 @@ impl<F: Field> ExecutionConfig<F> {
             height_map,
             stored_expressions_map,
             debug_expressions_map,
-            instrument,
         };
 
         Self::configure_lookup(
@@ -609,10 +607,6 @@ impl<F: Field> ExecutionConfig<F> {
             &cell_manager,
         );
         config
-    }
-
-    pub fn instrument(&self) -> &Instrument {
-        &self.instrument
     }
 
     #[allow(clippy::too_many_arguments)]
