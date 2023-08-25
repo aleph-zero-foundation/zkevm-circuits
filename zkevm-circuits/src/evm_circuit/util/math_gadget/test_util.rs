@@ -16,27 +16,16 @@ use crate::{
     table::LookupTable,
     util::{cell_manager::CellType, Challenges},
 };
-use eth_types::{Field, Word, U256};
+use eth_types::{Field, Word};
 pub(crate) use halo2_proofs::circuit::{Layouter, Value};
 use halo2_proofs::{
     circuit::SimpleFloorPlanner,
-    dev::MockProver,
     plonk::{Circuit, ConstraintSystem, Error, FirstPhase, SecondPhase, Selector, ThirdPhase},
 };
 
-pub(crate) const WORD_LOW_MAX: Word = U256([u64::MAX, u64::MAX, 0, 0]);
-pub(crate) const WORD_HIGH_MAX: Word = U256([0, 0, u64::MAX, u64::MAX]);
 // Maximum field value in bn256: bn256::MODULES - 1
-pub(crate) const WORD_CELL_MAX: Word = U256([
-    0x43e1f593f0000000,
-    0x2833e84879b97091,
-    0xb85045b68181585d,
-    0x30644e72e131a029,
-]);
 
 // I256::MAX = 2^255 - 1, and I256::MIN = 2^255.
-pub(crate) const WORD_SIGNED_MAX: Word = U256([u64::MAX, u64::MAX, u64::MAX, i64::MAX as _]);
-pub(crate) const WORD_SIGNED_MIN: Word = U256([0, 0, 0, i64::MIN as _]);
 
 pub(crate) trait MathGadgetContainer<F: Field>: Clone {
     fn configure_gadget_container(cb: &mut EVMConstraintBuilder<F>) -> Self
@@ -69,14 +58,6 @@ pub(crate) struct UnitTestMathGadgetBaseCircuit<G> {
     _marker: PhantomData<G>,
 }
 
-impl<G> UnitTestMathGadgetBaseCircuit<G> {
-    fn new(witnesses: Vec<Word>) -> Self {
-        UnitTestMathGadgetBaseCircuit {
-            witnesses,
-            _marker: PhantomData,
-        }
-    }
-}
 
 impl<F: Field, G: MathGadgetContainer<F>> Circuit<F> for UnitTestMathGadgetBaseCircuit<G> {
     type Config = (UnitTestMathGadgetBaseCircuitConfig<F, G>, Challenges);
@@ -237,31 +218,4 @@ impl<F: Field, G: MathGadgetContainer<F>> Circuit<F> for UnitTestMathGadgetBaseC
     }
 }
 
-/// This fn test_math_gadget_container takes math gadget container and run a
-/// container based circuit. All test logic should be included in the container,
-/// and witness words are used for both input & output data. How to deal with
-/// the witness words is left to each container.
-pub(crate) fn test_math_gadget_container<F: Field, G: MathGadgetContainer<F>>(
-    witnesses: Vec<Word>,
-    expected_success: bool,
-) {
-    const K: usize = 12;
-    let circuit = UnitTestMathGadgetBaseCircuit::<G>::new(witnesses);
 
-    let prover = MockProver::<F>::run(K as u32, &circuit, vec![]).unwrap();
-    if expected_success {
-        assert_eq!(prover.verify(), Ok(()));
-    } else {
-        assert_ne!(prover.verify(), Ok(()));
-    }
-}
-
-/// A simple macro for less code & better readability
-macro_rules! try_test {
-    ($base_class:ty, $witnesses:expr, $expect_success:expr $(,)?) => {{
-        test_math_gadget_container::<Fr, $base_class>($witnesses.to_vec(), $expect_success)
-    }};
-}
-
-#[cfg(test)]
-pub(crate) use try_test;

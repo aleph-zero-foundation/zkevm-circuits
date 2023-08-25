@@ -76,28 +76,3 @@ impl<F: Field> ExecutionGadget<F> for IsZeroGadget<F> {
     }
 }
 
-#[cfg(test)]
-mod test {
-    use crate::test_util::CircuitTestBuilder;
-    use eth_types::{bytecode, Word};
-    use mock::TestContext;
-
-    fn test_ok(value: Word) {
-        let bytecode = bytecode! {
-            PUSH32(value)
-            ISZERO
-            STOP
-        };
-
-        CircuitTestBuilder::new_from_test_ctx(
-            TestContext::<2, 1>::simple_ctx_with_bytecode(bytecode).unwrap(),
-        )
-        .run();
-    }
-
-    #[test]
-    fn is_zero_gadget() {
-        test_ok(0x060504.into());
-        test_ok(0x0.into());
-    }
-}

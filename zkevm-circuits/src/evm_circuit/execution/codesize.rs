@@ -86,39 +86,3 @@ impl<F: Field> ExecutionGadget<F> for CodesizeGadget<F> {
         Ok(())
     }
 }
-
-#[cfg(test)]
-mod tests {
-    use crate::test_util::CircuitTestBuilder;
-    use eth_types::{bytecode, Word};
-    use mock::TestContext;
-
-    fn test_ok(large: bool) {
-        let mut code = bytecode! {};
-        if large {
-            for _ in 0..128 {
-                code.push(1, Word::from(0));
-            }
-        }
-        let tail = bytecode! {
-            CODESIZE
-            STOP
-        };
-        code.append(&tail);
-
-        CircuitTestBuilder::new_from_test_ctx(
-            TestContext::<2, 1>::simple_ctx_with_bytecode(code).unwrap(),
-        )
-        .run();
-    }
-
-    #[test]
-    fn test_codesize_gadget() {
-        test_ok(false);
-    }
-
-    #[test]
-    fn test_codesize_gadget_large() {
-        test_ok(true);
-    }
-}

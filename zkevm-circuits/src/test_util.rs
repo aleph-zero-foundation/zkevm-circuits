@@ -26,46 +26,6 @@ fn init_env_logger() {
 /// The CTB also includes a mechanism to recieve calls that will modify the
 /// block produced from the [`TestContext`] and apply them before starting to
 /// compute the proof.
-///
-/// ## Example:
-/// ```rust, no_run
-/// use eth_types::geth_types::Account;
-/// use eth_types::{address, bytecode, Address, Bytecode, ToWord, Word, U256, word};
-/// use mock::{TestContext, MOCK_ACCOUNTS, gwei, eth};
-/// use zkevm_circuits::test_util::CircuitTestBuilder;
-///     let code = bytecode! {
-/// // [ADDRESS, STOP]
-///     PUSH32(word!("
-/// 3000000000000000000000000000000000000000000000000000000000000000"))
-///     PUSH1(0)
-///     MSTORE
-///
-///     PUSH1(2)
-///     PUSH1(0)
-///     RETURN
-/// };
-/// let ctx = TestContext::<1, 1>::new(
-///     None,
-///     |accs| {
-///         accs[0].address(MOCK_ACCOUNTS[0]).balance(eth(20));
-///     },
-///     |mut txs, _accs| {
-///         txs[0]
-///             .from(MOCK_ACCOUNTS[0])
-///             .gas_price(gwei(2))
-///             .gas(Word::from(0x10000))
-///             .value(eth(2))
-///             .input(code.into());
-///     },
-///     |block, _tx| block.number(0xcafeu64),
-/// )
-/// .unwrap();
-///
-/// CircuitTestBuilder::new_from_test_ctx(ctx)
-///     .block_modifier(Box::new(|block| block.circuits_params.max_evm_rows = (1 << 18) - 100))
-///     .state_checks(Box::new(|prover, evm_rows, lookup_rows| assert!(prover.verify_at_rows_par(evm_rows.iter().cloned(), lookup_rows.iter().cloned()).is_err())))
-///     .run();
-/// ```
 pub struct CircuitTestBuilder<const NACC: usize, const NTX: usize> {
     test_ctx: Option<TestContext<NACC, NTX>>,
     circuits_params: Option<FixedCParams>,

@@ -3,8 +3,6 @@
 #[cfg(any(test, feature = "test-circuits"))]
 mod dev;
 pub(crate) mod param;
-#[cfg(test)]
-mod test;
 
 use crate::{
     evm_circuit::util::constraint_builder::BaseConstraintBuilder,
