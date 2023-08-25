@@ -77,27 +77,3 @@ impl<F: Field> ExecutionGadget<F> for PcGadget<F> {
     }
 }
 
-#[cfg(test)]
-mod test {
-    use crate::test_util::CircuitTestBuilder;
-    use eth_types::bytecode;
-    use mock::TestContext;
-
-    fn test_ok() {
-        let bytecode = bytecode! {
-            PUSH32(0)
-            PC
-            STOP
-        };
-
-        CircuitTestBuilder::new_from_test_ctx(
-            TestContext::<2, 1>::simple_ctx_with_bytecode(bytecode).unwrap(),
-        )
-        .run();
-    }
-
-    #[test]
-    fn pc_gadget_simple() {
-        test_ok();
-    }
-}

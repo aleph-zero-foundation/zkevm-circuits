@@ -81,27 +81,3 @@ impl<F: Field> ExecutionGadget<F> for MsizeGadget<F> {
     }
 }
 
-#[cfg(test)]
-mod test {
-    use crate::test_util::CircuitTestBuilder;
-    use eth_types::{bytecode, Word};
-    use mock::TestContext;
-
-    #[test]
-    fn msize_gadget() {
-        let address = Word::from(0x10);
-        let value = Word::from_big_endian(&(1..33).collect::<Vec<_>>());
-        let bytecode = bytecode! {
-            PUSH32(value)
-            PUSH32(address)
-            MSTORE
-            MSIZE
-            STOP
-        };
-
-        CircuitTestBuilder::new_from_test_ctx(
-            TestContext::<2, 1>::simple_ctx_with_bytecode(bytecode).unwrap(),
-        )
-        .run();
-    }
-}

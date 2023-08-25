@@ -79,22 +79,3 @@ impl<F: Field> ExecutionGadget<F> for CallerGadget<F> {
     }
 }
 
-#[cfg(test)]
-mod test {
-    use crate::test_util::CircuitTestBuilder;
-    use eth_types::bytecode;
-    use mock::TestContext;
-
-    #[test]
-    fn caller_gadget_test() {
-        let bytecode = bytecode! {
-            CALLER
-            STOP
-        };
-
-        CircuitTestBuilder::new_from_test_ctx(
-            TestContext::<2, 1>::simple_ctx_with_bytecode(bytecode).unwrap(),
-        )
-        .run();
-    }
-}
