@@ -321,14 +321,15 @@ fn assert_error_matches(result: Result<(), Vec<VerifyFailure>>, names: Vec<&str>
     assert_eq!(errors.len(), names.len(), "{:?}", errors);
     for i in 0..names.len() {
         match &errors[i] {
-            VerifyFailure::Lookup { .. } => {
-                // assert_eq!(lookup_name, &names[i])
+            VerifyFailure::Lookup {
+                name: lookup_name, ..
+            } => {
+                assert_eq!(lookup_name, &names[i])
             }
             VerifyFailure::ConstraintNotSatisfied { .. } => panic!(),
             VerifyFailure::CellNotAssigned { .. } => panic!(),
             VerifyFailure::ConstraintPoisoned { .. } => panic!(),
             VerifyFailure::Permutation { .. } => panic!(),
-            _ => {}
         }
     }
 }

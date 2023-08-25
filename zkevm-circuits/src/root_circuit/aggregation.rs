@@ -23,18 +23,10 @@ use snark_verifier::{
         PolynomialCommitmentScheme,
     },
     system::halo2::transcript,
-    util::arithmetic::{fe_to_limbs},
+    util::arithmetic::{fe_to_limbs, MultiMillerLoop},
     verifier::{self, plonk::PlonkProtocol, SnarkVerifier},
 };
 use std::{io, iter, rc::Rc};
-use std::fmt::Debug;
-
-use halo2_proofs::halo2curves::pairing::MultiMillerLoop as GeoMultiMillerLoop;
-use halo2_proofs::halo2curves::pairing::Engine as GeoEngine;
-use maingate::halo2::halo2curves::pairing::MultiMillerLoop as MaingateMultiMillerLoop;
-
-pub trait MultiMillerLoop: GeoMultiMillerLoop + MaingateMultiMillerLoop + Debug {}
-impl<M: GeoMultiMillerLoop + MaingateMultiMillerLoop + Debug> MultiMillerLoop for M {}
 
 /// Number of limbs to decompose a elliptic curve base field element into.
 pub const LIMBS: usize = 4;
@@ -216,28 +208,28 @@ impl AggregationConfig {
     #[allow(clippy::type_complexity)]
     pub fn aggregate<'a, M, As>(
         &self,
-        layouter: &mut impl Layouter<<M as GeoEngine>::Scalar>,
+        layouter: &mut impl Layouter<M::Scalar>,
         svk: &KzgSvk<M>,
-        snarks: impl IntoIterator<Item = SnarkWitness<'a, <M as GeoEngine>::G1Affine>>,
+        snarks: impl IntoIterator<Item = SnarkWitness<'a, M::G1Affine>>,
     ) -> Result<
         (
-            Vec<Vec<Vec<AssignedCell<<M as GeoEngine>::Scalar, <M as GeoEngine>::Scalar>>>>,
-            Vec<AssignedCell<<M as GeoEngine>::Scalar, <M as GeoEngine>::Scalar>>,
+            Vec<Vec<Vec<AssignedCell<M::Scalar, M::Scalar>>>>,
+            Vec<AssignedCell<M::Scalar, M::Scalar>>,
         ),
         Error,
     >
     where
         M: MultiMillerLoop,
-        <M as GeoEngine>::Scalar: Field,
+        M::Scalar: Field,
         for<'b> As: PolynomialCommitmentScheme<
-                <M as GeoEngine>::G1Affine,
-                Rc<Halo2Loader<'b, <M as GeoEngine>::G1Affine>>,
+                M::G1Affine,
+                Rc<Halo2Loader<'b, M::G1Affine>>,
                 VerifyingKey = KzgSvk<M>,
-                Output = KzgAccumulator<<M as GeoEngine>::G1Affine, Rc<Halo2Loader<'b, <M as GeoEngine>::G1Affine>>>,
+                Output = KzgAccumulator<M::G1Affine, Rc<Halo2Loader<'b, M::G1Affine>>>,
             > + AccumulationScheme<
-                <M as GeoEngine>::G1Affine,
-                Rc<Halo2Loader<'b, <M as GeoEngine>::G1Affine>>,
-                Accumulator = KzgAccumulator<<M as GeoEngine>::G1Affine, Rc<Halo2Loader<'b, <M as GeoEngine>::G1Affine>>>,
+                M::G1Affine,
+                Rc<Halo2Loader<'b, M::G1Affine>>,
+                Accumulator = KzgAccumulator<M::G1Affine, Rc<Halo2Loader<'b, M::G1Affine>>>,
                 VerifyingKey = KzgAsVerifyingKey,
             >,
     {
@@ -255,7 +247,7 @@ impl AggregationConfig {
 
                 let ctx = RegionCtx::new(region, 0);
 
-                let ecc_chip = self.ecc_chip::<<M as GeoEngine>::G1Affine>();
+                let ecc_chip = self.ecc_chip::<M::G1Affine>();
                 let loader = Halo2Loader::new(ecc_chip, ctx);
 
                 // Verify the cheap part and get accumulator (left-hand and right-hand side of
@@ -335,23 +327,23 @@ impl AggregationConfig {
 /// Returns `None` if any given snarks is invalid.
 pub fn aggregate<'a, M, As>(
     params: &ParamsKZG<M>,
-    snarks: impl IntoIterator<Item = Snark<'a, <M as GeoEngine>::G1Affine>>,
-) -> Result<[<M as GeoEngine>::Scalar; 4 * LIMBS], snark_verifier::Error>
+    snarks: impl IntoIterator<Item = Snark<'a, M::G1Affine>>,
+) -> Result<[M::Scalar; 4 * LIMBS], snark_verifier::Error>
 where
     M: MultiMillerLoop,
-    <M as GeoEngine>::G1Affine: SerdeObject,
-    <M as GeoEngine>::G2Affine: SerdeObject,
-    <M as GeoEngine>::Scalar: Field,
+    M::G1Affine: SerdeObject,
+    M::G2Affine: SerdeObject,
+    M::Scalar: Field,
     for<'b> As: PolynomialCommitmentScheme<
-            <M as GeoEngine>::G1Affine,
+            M::G1Affine,
             NativeLoader,
             VerifyingKey = KzgSvk<M>,
-            Output = KzgAccumulator<<M as GeoEngine>::G1Affine, NativeLoader>,
+            Output = KzgAccumulator<M::G1Affine, NativeLoader>,
         > + AccumulationSchemeProver<
-            <M as GeoEngine>::G1Affine,
-            Accumulator = KzgAccumulator<<M as GeoEngine>::G1Affine, NativeLoader>,
-            ProvingKey = KzgAsProvingKey<<M as GeoEngine>::G1Affine>,
-        > + AccumulationDecider<<M as GeoEngine>::G1Affine, NativeLoader, DecidingKey = KzgDecidingKey<M>>,
+            M::G1Affine,
+            Accumulator = KzgAccumulator<M::G1Affine, NativeLoader>,
+            ProvingKey = KzgAsProvingKey<M::G1Affine>,
+        > + AccumulationDecider<M::G1Affine, NativeLoader, DecidingKey = KzgDecidingKey<M>>,
 {
     let svk = KzgSvk::<M>::new(params.get_g()[0]);
     let dk = KzgDk::new(svk, params.g2(), params.s_g2());

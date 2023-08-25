@@ -16,10 +16,10 @@ use snark_verifier::{
         AccumulationDecider, AccumulationScheme, AccumulationSchemeProver,
         PolynomialCommitmentScheme,
     },
+    util::arithmetic::MultiMillerLoop,
     verifier::plonk::PlonkProtocol,
 };
 use std::{iter, marker::PhantomData, rc::Rc};
-use std::fmt::Debug;
 
 mod aggregation;
 
@@ -42,50 +42,43 @@ pub use snark_verifier::{
     system::halo2::{compile, transcript::evm::EvmTranscript, Config},
 };
 
-use halo2_proofs::halo2curves::pairing::MultiMillerLoop as GeoMultiMillerLoop;
-use halo2_proofs::halo2curves::pairing::Engine as GeoEngine;
-use maingate::halo2::halo2curves::pairing::MultiMillerLoop as MaingateMultiMillerLoop;
-
-pub trait MultiMillerLoop: GeoMultiMillerLoop + MaingateMultiMillerLoop + Debug {}
-impl<M: GeoMultiMillerLoop + MaingateMultiMillerLoop + Debug> MultiMillerLoop for M {}
-
 /// RootCircuit for aggregating SuperCircuit into a much smaller proof.
 #[derive(Clone)]
 pub struct RootCircuit<'a, M: MultiMillerLoop, As> {
     svk: KzgSvk<M>,
-    snark: SnarkWitness<'a, <M as GeoEngine>::G1Affine>,
-    instance: Vec<<M as GeoEngine>::Scalar>,
+    snark: SnarkWitness<'a, M::G1Affine>,
+    instance: Vec<M::Scalar>,
     _marker: PhantomData<As>,
 }
 
 impl<'a, M, As> RootCircuit<'a, M, As>
 where
     M: MultiMillerLoop,
-    <M as GeoEngine>::G1Affine: SerdeObject,
-    <M as GeoEngine>::G2Affine: SerdeObject,
-    <M as GeoEngine>::Scalar: Field,
+    M::G1Affine: SerdeObject,
+    M::G2Affine: SerdeObject,
+    M::Scalar: Field,
     As: PolynomialCommitmentScheme<
-            <M as GeoEngine>::G1Affine,
+            M::G1Affine,
             NativeLoader,
             VerifyingKey = KzgSvk<M>,
-            Output = KzgAccumulator<<M as GeoEngine>::G1Affine, NativeLoader>,
+            Output = KzgAccumulator<M::G1Affine, NativeLoader>,
         > + AccumulationSchemeProver<
-            <M as GeoEngine>::G1Affine,
-            Accumulator = KzgAccumulator<<M as GeoEngine>::G1Affine, NativeLoader>,
-            ProvingKey = KzgAsProvingKey<<M as GeoEngine>::G1Affine>,
-        > + AccumulationDecider<<M as GeoEngine>::G1Affine, NativeLoader, DecidingKey = KzgDecidingKey<M>>,
+            M::G1Affine,
+            Accumulator = KzgAccumulator<M::G1Affine, NativeLoader>,
+            ProvingKey = KzgAsProvingKey<M::G1Affine>,
+        > + AccumulationDecider<M::G1Affine, NativeLoader, DecidingKey = KzgDecidingKey<M>>,
 {
     /// Create a `RootCircuit` with accumulator computed given a `SuperCircuit`
     /// proof and its instance. Returns `None` if given proof is invalid.
     pub fn new(
         params: &ParamsKZG<M>,
-        super_circuit_protocol: &'a PlonkProtocol<<M as GeoEngine>::G1Affine>,
-        super_circuit_instances: Value<&'a Vec<Vec<<M as GeoEngine>::Scalar>>>,
+        super_circuit_protocol: &'a PlonkProtocol<M::G1Affine>,
+        super_circuit_instances: Value<&'a Vec<Vec<M::Scalar>>>,
         super_circuit_proof: Value<&'a [u8]>,
     ) -> Result<Self, snark_verifier::Error> {
         let num_instances = super_circuit_protocol.num_instance.iter().sum::<usize>() + 4 * LIMBS;
         let instance = {
-            let mut instance = Ok(vec![<M as GeoEngine>::Scalar::ZERO; num_instances]);
+            let mut instance = Ok(vec![M::Scalar::ZERO; num_instances]);
             super_circuit_instances
                 .as_ref()
                 .zip(super_circuit_proof.as_ref())
@@ -133,24 +126,24 @@ where
     }
 
     /// Returns instance
-    pub fn instance(&self) -> Vec<Vec<<M as GeoEngine>::Scalar>> {
+    pub fn instance(&self) -> Vec<Vec<M::Scalar>> {
         vec![self.instance.clone()]
     }
 }
 
-impl<'a, M, As> Circuit<<M as GeoEngine>::Scalar> for RootCircuit<'a, M, As>
+impl<'a, M, As> Circuit<M::Scalar> for RootCircuit<'a, M, As>
 where
     M: MultiMillerLoop,
-    <M as GeoEngine>::Scalar: Field,
+    M::Scalar: Field,
     for<'b> As: PolynomialCommitmentScheme<
-            <M as GeoEngine>::G1Affine,
-            Rc<Halo2Loader<'b, <M as GeoEngine>::G1Affine>>,
+            M::G1Affine,
+            Rc<Halo2Loader<'b, M::G1Affine>>,
             VerifyingKey = KzgSvk<M>,
-            Output = KzgAccumulator<<M as GeoEngine>::G1Affine, Rc<Halo2Loader<'b, <M as GeoEngine>::G1Affine>>>,
+            Output = KzgAccumulator<M::G1Affine, Rc<Halo2Loader<'b, M::G1Affine>>>,
         > + AccumulationScheme<
-            <M as GeoEngine>::G1Affine,
-            Rc<Halo2Loader<'b, <M as GeoEngine>::G1Affine>>,
-            Accumulator = KzgAccumulator<<M as GeoEngine>::G1Affine, Rc<Halo2Loader<'b, <M as GeoEngine>::G1Affine>>>,
+            M::G1Affine,
+            Rc<Halo2Loader<'b, M::G1Affine>>,
+            Accumulator = KzgAccumulator<M::G1Affine, Rc<Halo2Loader<'b, M::G1Affine>>>,
             VerifyingKey = KzgAsVerifyingKey,
         >,
 {
@@ -162,19 +155,19 @@ where
         Self {
             svk: self.svk,
             snark: self.snark.without_witnesses(),
-            instance: vec![<M as GeoEngine>::Scalar::ZERO; self.instance.len()],
+            instance: vec![M::Scalar::ZERO; self.instance.len()],
             _marker: PhantomData,
         }
     }
 
-    fn configure(meta: &mut ConstraintSystem<<M as GeoEngine>::Scalar>) -> Self::Config {
-        AggregationConfig::configure::<<M as GeoEngine>::G1Affine>(meta)
+    fn configure(meta: &mut ConstraintSystem<M::Scalar>) -> Self::Config {
+        AggregationConfig::configure::<M::G1Affine>(meta)
     }
 
     fn synthesize(
         &self,
         config: Self::Config,
-        mut layouter: impl Layouter<<M as GeoEngine>::Scalar>,
+        mut layouter: impl Layouter<M::Scalar>,
     ) -> Result<(), Error> {
         config.load_table(&mut layouter)?;
         let (instance, accumulator_limbs) =
