@@ -1218,13 +1218,12 @@ dependencies = [
 [[package]]
 name = "halo2_proofs"
 version = "0.2.0"
-source = "git+https://github.com/geometryresearch/halo2.git?branch=pse-mvlookup#35b489e7e633e2fd37c123f72ee207db5ff66e8d"
+source = "git+https://github.com/privacy-scaling-explorations/halo2.git?tag=v2023_04_20#be955686f86eb618f55d2320c0e042485b313d22"
 dependencies = [
  "blake2b_simd",
  "ff",
  "group",
  "halo2curves",
- "lazy_static",
  "rand_chacha",
  "rand_core",
  "rayon",
@@ -1234,11 +1233,9 @@ dependencies = [
 
 [[package]]
 name = "halo2curves"
-version = "0.1.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e6b1142bd1059aacde1b477e0c80c142910f1ceae67fc619311d6a17428007ab"
+version = "0.3.2"
+source = "git+https://github.com/privacy-scaling-explorations/halo2curves?tag=0.3.2#9f5c50810bbefe779ee5cf1d852b2fe85dc35d5e"
 dependencies = [
- "blake2b_simd",
  "ff",
  "group",
  "lazy_static",

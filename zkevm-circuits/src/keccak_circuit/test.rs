@@ -4,7 +4,7 @@ use halo2_proofs::{dev::MockProver, halo2curves::bn256::Fr};
 use log::error;
 use std::iter::zip;
 use halo2_proofs::halo2curves::bn256::Bn256;
-use halo2_proofs::plonk::{keygen_pk, keygen_vk};
+use halo2_proofs::plonk::{keygen_vk};
 use halo2_proofs::poly::kzg::commitment::ParamsKZG;
 use rand::SeedableRng;
 use rand_chacha::ChaCha20Rng;
@@ -35,7 +35,9 @@ fn keygen_check<F: Field>(k: u32, inputs: Vec<Vec<u8>>) {
     let general_params = ParamsKZG::<Bn256>::setup(k, &mut rng);
 
     let vk = keygen_vk(&general_params, &circuit).expect("keygen_vk should not fail");
-    let _pk = keygen_pk(&general_params, vk, &circuit).expect("keygen_pk should not fail");
+
+    // println!("{}", vk.cs().lookups_map.len());
+    println!("LOOKUPS: {}", vk.cs().lookups().len());
 }
 
 #[test]

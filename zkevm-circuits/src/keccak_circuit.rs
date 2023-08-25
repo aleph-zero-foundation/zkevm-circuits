@@ -834,7 +834,7 @@ impl<F: Field> SubCircuitConfig<F> for KeccakCircuitConfig<F> {
 
         debug!("Degree: {}", meta.degree());
         debug!("Minimum rows: {}", meta.minimum_rows());
-        println!("Total Lookups: {}", total_lookup_counter);
+        debug!("Total Lookups: {}", total_lookup_counter);
         debug!("Total Columns: {}", cell_manager.get_width());
         debug!(
             "num unused cells: {}",

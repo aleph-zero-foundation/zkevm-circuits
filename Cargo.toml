@@ -9,9 +9,6 @@ members = [
     "mock",
 ]
 
-[patch.crates-io]
-halo2_proofs = { git = "https://github.com/geometryresearch/halo2.git", branch = "pse-mvlookup" }
-
 # Definition of benchmarks profile to use.
 [profile.bench]
 opt-level = 3
