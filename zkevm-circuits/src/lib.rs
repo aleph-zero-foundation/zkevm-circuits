@@ -1,3 +1,5 @@
+#![deny(unused_crate_dependencies)]
+
 //! # zk_evm
 
 // We should try not to use incomplete_features unless it is really really needed and cannot be
