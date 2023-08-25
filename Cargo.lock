@@ -331,7 +331,7 @@ dependencies = [
  "ethers-core",
  "ethers-providers",
  "gadgets",
- "halo2_proofs 0.2.0 (git+https://github.com/geometryresearch/halo2.git?branch=pse-mvlookup)",
+ "halo2_proofs",
  "hex",
  "itertools",
  "lazy_static",
@@ -471,7 +471,7 @@ dependencies = [
  "env_logger",
  "eth-types",
  "ethers-signers",
- "halo2_proofs 0.2.0 (git+https://github.com/geometryresearch/halo2.git?branch=pse-mvlookup)",
+ "halo2_proofs",
  "itertools",
  "mock",
  "rand",
@@ -1087,7 +1087,7 @@ version = "0.1.0"
 dependencies = [
  "ethers-core",
  "ethers-signers",
- "halo2_proofs 0.2.0 (git+https://github.com/geometryresearch/halo2.git?branch=pse-mvlookup)",
+ "halo2_proofs",
  "hex",
  "itertools",
  "lazy_static",
@@ -1622,7 +1622,7 @@ version = "0.1.0"
 dependencies = [
  "digest 0.7.6",
  "eth-types",
- "halo2_proofs 0.2.0 (git+https://github.com/geometryresearch/halo2.git?branch=pse-mvlookup)",
+ "halo2_proofs",
  "rand",
  "rand_xorshift",
  "sha3 0.7.3",
@@ -1742,48 +1742,12 @@ dependencies = [
  "blake2b_simd",
  "ff",
  "group",
- "halo2curves 0.3.2",
+ "halo2curves",
  "rand_chacha",
  "rand_core",
  "rayon",
  "sha3 0.9.1",
  "tracing",
-]
-
-[[package]]
-name = "halo2_proofs"
-version = "0.2.0"
-source = "git+https://github.com/geometryresearch/halo2.git?branch=pse-mvlookup#35b489e7e633e2fd37c123f72ee207db5ff66e8d"
-dependencies = [
- "blake2b_simd",
- "ff",
- "group",
- "halo2curves 0.1.0",
- "rand_chacha",
- "rand_core",
- "rayon",
- "sha3 0.9.1",
- "tracing",
-]
-
-[[package]]
-name = "halo2curves"
-version = "0.1.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e6b1142bd1059aacde1b477e0c80c142910f1ceae67fc619311d6a17428007ab"
-dependencies = [
- "blake2b_simd",
- "ff",
- "group",
- "lazy_static",
- "num-bigint",
- "num-traits",
- "pasta_curves",
- "paste",
- "rand",
- "rand_core",
- "static_assertions",
- "subtle",
 ]
 
 [[package]]
@@ -1809,7 +1773,7 @@ name = "halo2wrong"
 version = "0.1.0"
 source = "git+https://github.com/privacy-scaling-explorations/halo2wrong?tag=v2023_04_20#f72db265aa3cebe297c9b9816e940d0e1d400886"
 dependencies = [
- "halo2_proofs 0.2.0 (git+https://github.com/privacy-scaling-explorations/halo2.git?tag=v2023_04_20)",
+ "halo2_proofs",
  "num-bigint",
  "num-integer",
  "num-traits",
@@ -2128,7 +2092,7 @@ dependencies = [
  "env_logger",
  "eth-types",
  "ethers",
- "halo2_proofs 0.2.0 (git+https://github.com/geometryresearch/halo2.git?branch=pse-mvlookup)",
+ "halo2_proofs",
  "lazy_static",
  "log",
  "mock",
@@ -2909,7 +2873,7 @@ name = "poseidon"
 version = "0.2.0"
 source = "git+https://github.com/privacy-scaling-explorations/poseidon.git?tag=v2023_04_20#807f8f555313f726ca03bdf941f798098f488ba4"
 dependencies = [
- "halo2curves 0.3.2",
+ "halo2curves",
  "subtle",
 ]
 
@@ -3765,8 +3729,8 @@ source = "git+https://github.com/privacy-scaling-explorations/snark-verifier?tag
 dependencies = [
  "bytes",
  "ecc",
- "halo2_proofs 0.2.0 (git+https://github.com/privacy-scaling-explorations/halo2.git?tag=v2023_04_20)",
- "halo2curves 0.3.2",
+ "halo2_proofs",
+ "halo2curves",
  "hex",
  "itertools",
  "lazy_static",
@@ -3982,7 +3946,7 @@ dependencies = [
  "ethers-signers",
  "external-tracer",
  "glob",
- "halo2_proofs 0.2.0 (git+https://github.com/geometryresearch/halo2.git?branch=pse-mvlookup)",
+ "halo2_proofs",
  "handlebars",
  "hex",
  "log",
@@ -4686,7 +4650,7 @@ dependencies = [
  "ethers-core",
  "ethers-signers",
  "gadgets",
- "halo2_proofs 0.2.0 (git+https://github.com/geometryresearch/halo2.git?branch=pse-mvlookup)",
+ "halo2_proofs",
  "hex",
  "integer",
  "itertools",
