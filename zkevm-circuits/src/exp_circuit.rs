@@ -5,8 +5,6 @@ mod dev;
 pub(crate) mod param;
 #[cfg(test)]
 mod test;
-#[cfg(feature = "test-circuits")]
-pub use dev::ExpCircuit as TestExpCircuit;
 
 use crate::{
     evm_circuit::util::constraint_builder::BaseConstraintBuilder,

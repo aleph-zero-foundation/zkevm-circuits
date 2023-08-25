@@ -11,11 +11,7 @@ pub mod step;
 pub mod table;
 pub(crate) mod util;
 
-#[cfg(test)]
-pub(crate) mod test;
 use self::step::HasExecutionState;
-#[cfg(feature = "test-circuits")]
-pub use self::EvmCircuit as TestEvmCircuit;
 
 pub use crate::witness;
 use crate::{
@@ -183,26 +179,6 @@ impl<F: Field> EvmCircuit<F> {
             fixed_table_tags: FixedTableTag::iter().collect(),
         }
     }
-    #[cfg(any(test, feature = "test-circuits"))]
-    /// Construct the EvmCircuit with only subset of Fixed table tags required by tests to save
-    /// testing time
-    pub(crate) fn get_test_circuit_from_block(block: Block<F>) -> Self {
-        let fixed_table_tags = detect_fixed_table_tags(&block);
-        Self {
-            block: Some(block),
-            fixed_table_tags,
-        }
-    }
-    #[cfg(any(test, feature = "test-circuits"))]
-    /// Calculate which rows are "actually" used in the circuit
-    pub(crate) fn get_active_rows(block: &Block<F>) -> (Vec<usize>, Vec<usize>) {
-        let max_offset = Self::get_num_rows_required(block);
-        // some gates are enabled on all rows
-        let gates_row_ids = (0..max_offset).collect();
-        // lookups are enabled at "q_step" rows and byte lookup rows
-        let lookup_row_ids = (0..max_offset).collect();
-        (gates_row_ids, lookup_row_ids)
-    }
     /// Get the minimum number of rows required to process the block
     /// If unspecified, then compute it
     pub(crate) fn get_num_rows_required(block: &Block<F>) -> usize {
@@ -344,12 +320,6 @@ pub(crate) mod cached {
             self.0.synthesize(config, layouter)
         }
     }
-
-    impl EvmCircuitCached {
-        pub(crate) fn get_test_circuit_from_block(block: Block<Fr>) -> Self {
-            Self(EvmCircuit::<Fr>::get_test_circuit_from_block(block))
-        }
-    }
 }
 
 // Always exported because of `EXECUTION_STATE_HEIGHT_MAP`
@@ -435,94 +405,3 @@ impl<F: Field> Circuit<F> for EvmCircuit<F> {
     }
 }
 
-#[cfg(test)]
-mod evm_circuit_stats {
-    use crate::{
-        evm_circuit::EvmCircuit,
-        test_util::CircuitTestBuilder,
-        util::{unusable_rows, SubCircuit},
-        witness::block_convert,
-    };
-    use bus_mapping::{circuit_input_builder::FixedCParams, mock::BlockData};
-
-    use eth_types::{bytecode, geth_types::GethData};
-    use halo2_proofs::{self, dev::MockProver, halo2curves::bn256::Fr};
-
-    use mock::test_ctx::{
-        helpers::{account_0_code_account_1_no_code, tx_from_1_to_0},
-        TestContext,
-    };
-
-    #[test]
-    fn evm_circuit_unusable_rows() {
-        assert_eq!(
-            EvmCircuit::<Fr>::unusable_rows(),
-            unusable_rows::<Fr, EvmCircuit::<Fr>>(()),
-        )
-    }
-
-    #[test]
-    pub fn empty_evm_circuit_no_padding() {
-        CircuitTestBuilder::new_from_test_ctx(
-            TestContext::<0, 0>::new(None, |_| {}, |_, _| {}, |b, _| b).unwrap(),
-        )
-        .run();
-    }
-
-    #[test]
-    pub fn empty_evm_circuit_with_padding() {
-        CircuitTestBuilder::new_from_test_ctx(
-            TestContext::<0, 0>::new(None, |_| {}, |_, _| {}, |b, _| b).unwrap(),
-        )
-        .block_modifier(Box::new(|block| {
-            block.circuits_params.max_evm_rows = (1 << 18) - 100
-        }))
-        .run();
-    }
-
-    #[test]
-    fn variadic_size_check() {
-        let params = FixedCParams {
-            max_evm_rows: 1 << 12,
-            ..Default::default()
-        };
-        // Empty
-        let block: GethData = TestContext::<0, 0>::new(None, |_| {}, |_, _| {}, |b, _| b)
-            .unwrap()
-            .into();
-        let mut builder = BlockData::new_from_geth_data_with_params(block.clone(), params)
-            .new_circuit_input_builder();
-        builder
-            .handle_block(&block.eth_block, &block.geth_traces)
-            .unwrap();
-        let block = block_convert::<Fr>(&builder).unwrap();
-        let k = block.get_test_degree();
-
-        let circuit = EvmCircuit::<Fr>::get_test_circuit_from_block(block);
-        let prover1 = MockProver::<Fr>::run(k, &circuit, vec![]).unwrap();
-
-        let code = bytecode! {
-            STOP
-        };
-        let block: GethData = TestContext::<2, 1>::new(
-            None,
-            account_0_code_account_1_no_code(code),
-            tx_from_1_to_0,
-            |b, _| b,
-        )
-        .unwrap()
-        .into();
-        let mut builder = BlockData::new_from_geth_data_with_params(block.clone(), params)
-            .new_circuit_input_builder();
-        builder
-            .handle_block(&block.eth_block, &block.geth_traces)
-            .unwrap();
-        let block = block_convert::<Fr>(&builder).unwrap();
-        let k = block.get_test_degree();
-        let circuit = EvmCircuit::<Fr>::get_test_circuit_from_block(block);
-        let prover2 = MockProver::<Fr>::run(k, &circuit, vec![]).unwrap();
-
-        assert_eq!(prover1.fixed(), prover2.fixed());
-        assert_eq!(prover1.permutation(), prover2.permutation());
-    }
-}

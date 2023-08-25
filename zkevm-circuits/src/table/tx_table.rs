@@ -3,6 +3,7 @@ use super::*;
 /// Tag used to identify each field in the transaction in a row of the
 /// transaction table.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
+#[allow(unused)]
 pub enum TxFieldTag {
     /// Unused tag
     Null = 0,

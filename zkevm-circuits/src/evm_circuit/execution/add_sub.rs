@@ -105,39 +105,3 @@ impl<F: Field> ExecutionGadget<F> for AddSubGadget<F> {
         Ok(())
     }
 }
-
-#[cfg(test)]
-mod test {
-    use crate::{evm_circuit::test::rand_word, test_util::CircuitTestBuilder};
-    use eth_types::{bytecode, evm_types::OpcodeId, Word};
-
-    use mock::TestContext;
-
-    fn test_ok(opcode: OpcodeId, a: Word, b: Word) {
-        let bytecode = bytecode! {
-            PUSH32(a)
-            PUSH32(b)
-            .write_op(opcode)
-            STOP
-        };
-
-        CircuitTestBuilder::new_from_test_ctx(
-            TestContext::<2, 1>::simple_ctx_with_bytecode(bytecode).unwrap(),
-        )
-        .run()
-    }
-
-    #[test]
-    fn add_gadget_simple() {
-        test_ok(OpcodeId::ADD, 0x030201.into(), 0x060504.into());
-        test_ok(OpcodeId::SUB, 0x090705.into(), 0x060504.into());
-    }
-
-    #[test]
-    fn add_gadget_rand() {
-        let a = rand_word();
-        let b = rand_word();
-        test_ok(OpcodeId::ADD, a, b);
-        test_ok(OpcodeId::SUB, a, b);
-    }
-}

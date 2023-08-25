@@ -10,8 +10,6 @@ mod util;
 mod dev;
 #[cfg(test)]
 mod test;
-#[cfg(feature = "test-circuits")]
-pub use dev::KeccakCircuit as TestKeccakCircuit;
 
 use std::marker::PhantomData;
 pub use KeccakCircuitConfig as KeccakConfig;

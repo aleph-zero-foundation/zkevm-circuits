@@ -1,6 +1,4 @@
 use crate::util::Expr;
-use eth_types::Field;
-use halo2_proofs::plonk::Expression;
 
 mod abs_word;
 mod add_words;
@@ -45,25 +43,3 @@ pub(crate) use mul_word_u64::MulWordByU64Gadget;
 pub(crate) use pair_select::PairSelectGadget;
 pub(crate) use range_check::RangeCheckGadget;
 pub(crate) use rlp::ContractCreateGadget;
-
-// This function generates a Lagrange polynomial in the range [start, end) which
-// will be evaluated to 1 when `exp == value`, otherwise 0
-pub(crate) fn generate_lagrange_base_polynomial<
-    F: Field,
-    Exp: Expr<F>,
-    R: Iterator<Item = usize>,
->(
-    exp: Exp,
-    val: usize,
-    range: R,
-) -> Expression<F> {
-    let mut numerator = 1u64.expr();
-    let mut denominator = F::from(1);
-    for x in range {
-        if x != val {
-            numerator = numerator * (exp.expr() - x.expr());
-            denominator *= F::from(val as u64) - F::from(x as u64);
-        }
-    }
-    numerator * denominator.invert().unwrap()
-}

@@ -2,7 +2,6 @@
 pub mod int_decomposition;
 pub mod word;
 
-use bus_mapping::evm::OpcodeId;
 use halo2_proofs::{
     circuit::{Layouter, Value},
     plonk::{
@@ -92,12 +91,6 @@ impl<T: Clone> Challenges<T> {
         [&self.keccak_input, &self.lookup_input]
     }
 
-    pub(crate) fn mock(keccak_input: T, lookup_input: T) -> Self {
-        Self {
-            keccak_input,
-            lookup_input,
-        }
-    }
 }
 
 impl<F: Field> Challenges<Expression<F>> {
@@ -188,18 +181,6 @@ pub fn log2_ceil(n: usize) -> u32 {
 
 pub(crate) fn keccak(msg: &[u8]) -> Word {
     Word::from_big_endian(keccak256(msg).as_slice())
-}
-
-pub(crate) fn is_push_with_data(byte: u8) -> bool {
-    OpcodeId::from(byte).is_push_with_data()
-}
-
-pub(crate) fn get_push_size(byte: u8) -> u64 {
-    if is_push_with_data(byte) {
-        byte as u64 - OpcodeId::PUSH0.as_u64()
-    } else {
-        0u64
-    }
 }
 
 #[cfg(test)]

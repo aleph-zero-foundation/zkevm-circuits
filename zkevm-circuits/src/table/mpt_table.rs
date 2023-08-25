@@ -1,10 +1,4 @@
 use super::*;
-use crate::{
-    circuit,
-    circuit_tools::{
-        cached_region::CachedRegion, cell_manager::CellType, constraint_builder::ConstraintBuilder,
-    },
-};
 use serde::{Deserialize, Serialize};
 
 /// The types of proofs in the MPT table
@@ -95,96 +89,5 @@ impl<F: Field> LookupTable<F> for MptTable {
             String::from("old_value_lo"),
             String::from("old_value_hi"),
         ]
-    }
-}
-
-impl MptTable {
-    /// Construct a new MptTable
-    pub(crate) fn construct<F: Field>(meta: &mut ConstraintSystem<F>) -> Self {
-        Self {
-            address: meta.advice_column(),
-            storage_key: word::Word::new([meta.advice_column(), meta.advice_column()]),
-            proof_type: meta.advice_column(),
-            new_root: word::Word::new([meta.advice_column(), meta.advice_column()]),
-            old_root: word::Word::new([meta.advice_column(), meta.advice_column()]),
-            new_value: word::Word::new([meta.advice_column(), meta.advice_column()]),
-            old_value: word::Word::new([meta.advice_column(), meta.advice_column()]),
-        }
-    }
-
-    #[allow(clippy::too_many_arguments)]
-    pub(crate) fn constrain<F: Field, C: CellType>(
-        &self,
-        meta: &mut VirtualCells<'_, F>,
-        cb: &mut ConstraintBuilder<F, C>,
-        address: Expression<F>,
-        proof_type: Expression<F>,
-        storage_key: word::Word<Expression<F>>,
-        new_root: word::Word<Expression<F>>,
-        old_root: word::Word<Expression<F>>,
-        new_value: word::Word<Expression<F>>,
-        old_value: word::Word<Expression<F>>,
-    ) {
-        circuit!([meta, cb], {
-            require!(a!(self.address) => address);
-            require!([a!(self.storage_key.lo()), a!(self.storage_key.hi())] => storage_key);
-            require!(a!(self.proof_type) => proof_type);
-            require!([a!(self.new_root.lo()), a!(self.new_root.hi())] => new_root);
-            require!([a!(self.old_root.lo()), a!(self.old_root.hi())] => old_root);
-            require!([a!(self.new_value.lo()), a!(self.new_value.hi())] => new_value);
-            require!([a!(self.old_value.lo()), a!(self.old_value.hi())] => old_value);
-        })
-    }
-
-    pub(crate) fn assign<F: Field>(
-        &self,
-        region: &mut Region<'_, F>,
-        offset: usize,
-        row: &MptUpdateRow<Value<F>>,
-    ) -> Result<(), Error> {
-        for (column, value) in <MptTable as LookupTable<F>>::advice_columns(self)
-            .iter()
-            .zip_eq(row.values())
-        {
-            region.assign_advice(|| "assign mpt table row value", *column, offset, || value)?;
-        }
-        Ok(())
-    }
-
-    pub(crate) fn assign_cached<F: Field>(
-        &self,
-        region: &mut CachedRegion<'_, '_, F>,
-        offset: usize,
-        row: &MptUpdateRow<Value<F>>,
-    ) -> Result<(), Error> {
-        for (column, value) in <MptTable as LookupTable<F>>::advice_columns(self)
-            .iter()
-            .zip_eq(row.values())
-        {
-            region.assign_advice(|| "assign mpt table row value", *column, offset, || value)?;
-        }
-        Ok(())
-    }
-
-    pub(crate) fn load<F: Field>(
-        &self,
-        layouter: &mut impl Layouter<F>,
-        updates: &MptUpdates,
-    ) -> Result<(), Error> {
-        layouter.assign_region(
-            || "mpt table",
-            |mut region| self.load_with_region(&mut region, updates),
-        )
-    }
-
-    pub(crate) fn load_with_region<F: Field>(
-        &self,
-        region: &mut Region<'_, F>,
-        updates: &MptUpdates,
-    ) -> Result<(), Error> {
-        for (offset, row) in updates.table_assignments().iter().enumerate() {
-            self.assign(region, offset, row)?;
-        }
-        Ok(())
     }
 }

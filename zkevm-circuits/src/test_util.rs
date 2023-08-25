@@ -1,15 +1,10 @@
 //! Testing utilities
 
 use crate::{
-    evm_circuit::{cached::EvmCircuitCached, EvmCircuit},
-    util::SubCircuit,
-    witness::{Block, Rw},
+    witness::{Block, },
 };
-use bus_mapping::{circuit_input_builder::FixedCParams, mock::BlockData};
-use eth_types::geth_types::GethData;
-use std::cmp;
+use bus_mapping::{circuit_input_builder::FixedCParams, };
 
-use crate::util::log2_ceil;
 use halo2_proofs::{dev::MockProver, halo2curves::bn256::Fr};
 use mock::TestContext;
 
@@ -19,8 +14,6 @@ fn init_env_logger() {
     // Enable RUST_LOG during tests
     env_logger::Builder::from_env(env_logger::Env::default().default_filter_or("error")).init();
 }
-
-const NUM_BLINDING_ROWS: usize = 64;
 
 #[allow(clippy::type_complexity)]
 /// Struct used to easily generate tests for EVM &| State circuits being able to

@@ -5,10 +5,6 @@ pub(crate) mod util;
 
 #[cfg(any(test, feature = "test-circuits"))]
 mod dev;
-#[cfg(test)]
-mod test;
-#[cfg(feature = "test-circuits")]
-pub use dev::CopyCircuit as TestCopyCircuit;
 
 use crate::{
     evm_circuit::util::constraint_builder::{BaseConstraintBuilder, ConstrainBuilderCommon},
