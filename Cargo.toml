@@ -13,7 +13,8 @@ members = [
 ]
 
 [patch.crates-io]
-halo2_proofs = { git = "https://github.com/privacy-scaling-explorations/halo2.git", tag = "v2023_04_20" }
+halo2_proofs = { git = "https://github.com/geometryresearch/halo2.git", features = ["circuit-params"], branch = "pse-mvlookup" }
+
 
 # Definition of benchmarks profile to use.
 [profile.bench]
