@@ -2,7 +2,6 @@
 
 use crate::{
     evm_circuit::{cached::EvmCircuitCached, EvmCircuit},
-    state_circuit::StateCircuit,
     util::SubCircuit,
     witness::{Block, Rw},
 };
@@ -181,56 +180,5 @@ impl<const NACC: usize, const NTX: usize> CircuitTestBuilder<NACC, NTX> {
     /// into a [`Block`] and apply the default or provided block_modifiers or
     /// circuit checks to the provers generated for the State and EVM circuits.
     pub fn run(self) {
-        let block: Block<Fr> = if self.block.is_some() {
-            self.block.unwrap()
-        } else if self.test_ctx.is_some() {
-            let block: GethData = self.test_ctx.unwrap().into();
-            let builder = BlockData::new_from_geth_data(block.clone()).new_circuit_input_builder();
-            let builder = builder
-                .handle_block(&block.eth_block, &block.geth_traces)
-                .unwrap();
-            // Build a witness block from trace result.
-            let mut block = crate::witness::block_convert(&builder).unwrap();
-
-            for modifier_fn in self.block_modifiers {
-                modifier_fn.as_ref()(&mut block);
-            }
-            block
-        } else {
-            panic!("No attribute to build a block was passed to the CircuitTestBuilder")
-        };
-        let params = block.circuits_params;
-
-        // Run evm circuit test
-        {
-            let k = block.get_test_degree();
-
-            let (active_gate_rows, active_lookup_rows) = EvmCircuit::<Fr>::get_active_rows(&block);
-
-            let circuit = EvmCircuitCached::get_test_circuit_from_block(block.clone());
-            let prover = MockProver::<Fr>::run(k, &circuit, vec![]).unwrap();
-
-            self.evm_checks.as_ref()(prover, &active_gate_rows, &active_lookup_rows)
-        }
-
-        // Run state circuit test
-        // TODO: use randomness as one of the circuit public input, since randomness in
-        // state circuit and evm circuit must be same
-        {
-            let rows_needed = StateCircuit::<Fr>::min_num_rows_block(&block).1;
-            let k = cmp::max(log2_ceil(rows_needed + NUM_BLINDING_ROWS), 18);
-            let state_circuit = StateCircuit::<Fr>::new(block.rws, params.max_rws);
-            let instance = state_circuit.instance();
-            let prover = MockProver::<Fr>::run(k, &state_circuit, instance).unwrap();
-            // Skip verification of Start rows to accelerate testing
-            let non_start_rows_len = state_circuit
-                .rows
-                .iter()
-                .filter(|rw| !matches!(rw, Rw::Start { .. }))
-                .count();
-            let rows = (params.max_rws - non_start_rows_len..params.max_rws).collect();
-
-            self.state_checks.as_ref()(prover, &rows, &rows);
-        }
     }
 }

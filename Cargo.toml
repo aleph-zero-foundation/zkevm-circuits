@@ -4,8 +4,6 @@ members = [
     "bus-mapping",
     "geth-utils",
     "gadgets",
-    "integration-tests",
-    "circuit-benchmarks",
     "eth-types",
     "external-tracer",
     "mock",
