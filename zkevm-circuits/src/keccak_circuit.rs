@@ -42,7 +42,7 @@ use halo2_proofs::{
     plonk::{Column, ConstraintSystem, Error, Expression, Fixed, TableColumn, VirtualCells},
     poly::Rotation,
 };
-use log::{debug, warn};
+use log::{debug};
 
 pub(crate) static DEFAULT_CELL_TYPE: CellType = CellType::StoragePhase1;
 
@@ -834,7 +834,7 @@ impl<F: Field> SubCircuitConfig<F> for KeccakCircuitConfig<F> {
 
         debug!("Degree: {}", meta.degree());
         debug!("Minimum rows: {}", meta.minimum_rows());
-        warn!("Total Lookups: {}", total_lookup_counter);
+        println!("Total Lookups: {}", total_lookup_counter);
         debug!("Total Columns: {}", cell_manager.get_width());
         debug!(
             "num unused cells: {}",
