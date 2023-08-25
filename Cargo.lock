@@ -1224,6 +1224,7 @@ dependencies = [
  "ff",
  "group",
  "halo2curves",
+ "lazy_static",
  "rand_chacha",
  "rand_core",
  "rayon",
