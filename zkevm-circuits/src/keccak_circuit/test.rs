@@ -36,7 +36,6 @@ fn keygen_check<F: Field>(k: u32, inputs: Vec<Vec<u8>>) {
 
     let vk = keygen_vk(&general_params, &circuit).expect("keygen_vk should not fail");
 
-    // println!("{}", vk.cs().lookups_map.len());
     println!("LOOKUPS: {}", vk.cs().lookups().len());
 }
 
