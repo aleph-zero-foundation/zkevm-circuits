@@ -13,7 +13,7 @@ pub(crate) mod util;
 
 use self::step::HasExecutionState;
 
-pub use crate::witness;
+pub(crate) use crate::witness;
 use crate::{
     evm_circuit::param::{MAX_STEP_HEIGHT, STEP_STATE_HEIGHT},
     table::{

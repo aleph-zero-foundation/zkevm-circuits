@@ -72,59 +72,6 @@ impl<F: Field> Block<F> {
     pub(crate) fn get_rws(&self, step: &ExecStep, index: usize) -> Rw {
         self.rws[step.rw_index(index)]
     }
-
-    /// Obtains the expected Circuit degree needed in order to be able to test
-    /// the EvmCircuit with this block without needing to configure the
-    /// `ConstraintSystem`.
-    pub fn get_test_degree(&self) -> u32 {
-        let num_rows_required_for_execution_steps: usize =
-            EvmCircuit::<F>::get_num_rows_required(self);
-        let num_rows_required_for_rw_table: usize = self.circuits_params.max_rws;
-        let num_rows_required_for_fixed_table: usize = detect_fixed_table_tags(self)
-            .iter()
-            .map(|tag| tag.build::<F>().count())
-            .sum();
-        let num_rows_required_for_bytecode_table =
-            self.bytecodes.num_rows_required_for_bytecode_table();
-        let num_rows_required_for_copy_table: usize =
-            self.copy_events.iter().map(|c| c.bytes.len() * 2).sum();
-        let num_rows_required_for_keccak_table: usize = self.keccak_inputs.len();
-        let num_rows_required_for_tx_table: usize =
-            self.txs.iter().map(|tx| 9 + tx.call_data.len()).sum();
-        let num_rows_required_for_exp_table: usize = self
-            .exp_events
-            .iter()
-            .map(|e| e.steps.len() * OFFSET_INCREMENT)
-            .sum();
-
-        let rows_needed: usize = itertools::max([
-            num_rows_required_for_execution_steps,
-            num_rows_required_for_rw_table,
-            num_rows_required_for_fixed_table,
-            num_rows_required_for_bytecode_table,
-            num_rows_required_for_copy_table,
-            num_rows_required_for_keccak_table,
-            num_rows_required_for_tx_table,
-            num_rows_required_for_exp_table,
-            1 << 16, // u16 range lookup
-        ])
-        .unwrap();
-
-        let k = log2_ceil(EvmCircuit::<F>::unusable_rows() + rows_needed);
-        log::debug!(
-            "num_rows_requred_for rw_table={}, fixed_table={}, bytecode_table={}, \
-            copy_table={}, keccak_table={}, tx_table={}, exp_table={}",
-            num_rows_required_for_rw_table,
-            num_rows_required_for_fixed_table,
-            num_rows_required_for_bytecode_table,
-            num_rows_required_for_copy_table,
-            num_rows_required_for_keccak_table,
-            num_rows_required_for_tx_table,
-            num_rows_required_for_exp_table
-        );
-        log::debug!("evm circuit uses k = {}, rows = {}", k, rows_needed);
-        k
-    }
 }
 
 /// Block context for execution
@@ -229,40 +176,4 @@ impl From<&circuit_input_builder::Block> for BlockContext {
             chain_id: block.chain_id,
         }
     }
-}
-
-/// Convert a block struct in bus-mapping to a witness block used in circuits
-pub fn block_convert<F: Field>(
-    builder: &circuit_input_builder::CircuitInputBuilder<FixedCParams>,
-) -> Result<Block<F>, Error> {
-    let block = &builder.block;
-    let code_db = &builder.code_db;
-    let rws = RwMap::from(&block.container);
-    rws.check_value();
-    let mut block = Block {
-        // randomness: F::from(0x100), // Special value to reveal elements after RLC
-        randomness: F::from(0xcafeu64),
-        context: block.into(),
-        rws,
-        txs: block.txs().to_vec(),
-        end_block_not_last: block.block_steps.end_block_not_last.clone(),
-        end_block_last: block.block_steps.end_block_last.clone(),
-        bytecodes: code_db.clone(),
-        copy_events: block.copy_events.clone(),
-        exp_events: block.exp_events.clone(),
-        sha3_inputs: block.sha3_inputs.clone(),
-        circuits_params: builder.circuits_params,
-        exp_circuit_pad_to: <usize>::default(),
-        prev_state_root: block.prev_state_root,
-        keccak_inputs: circuit_input_builder::keccak_inputs(block, code_db)?,
-        eth_block: block.eth_block.clone(),
-    };
-    let public_data = public_data_convert(&block);
-    let rpi_bytes = public_data.get_pi_bytes(
-        block.circuits_params.max_txs,
-        block.circuits_params.max_calldata,
-    );
-    // PI Circuit
-    block.keccak_inputs.extend_from_slice(&[rpi_bytes]);
-    Ok(block)
 }

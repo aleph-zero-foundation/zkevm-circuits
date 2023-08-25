@@ -14,23 +14,19 @@ bus-mapping = { path = "../bus-mapping" }
 eth-types = { path = "../eth-types" }
 gadgets = { path = "../gadgets" }
 ethers-core = "2.0.7"
-mock = { path = "../mock", optional = true }
 strum = "0.24"
 strum_macros = "0.24"
 rand = "0.8"
 itertools = "0.10.3"
 lazy_static = "1.4"
 log = "0.4"
-env_logger = "0.9"
 rand_chacha = "0.3"
 cli-table = { version = "0.4", optional = true }
 serde = { version = "1.0.130", features = ["derive"] }
 
 [dev-dependencies]
 bus-mapping = { path = "../bus-mapping", features = ["test"] }
-ctor = "0.1.22"
 itertools = "0.10.1"
-mock = { path = "../mock" }
 
 [features]
 default = []

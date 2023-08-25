@@ -20,18 +20,15 @@
 #![deny(clippy::debug_assert_with_mut_call)]
 
 #[allow(dead_code, reason = "under active development")]
-pub mod circuit_tools;
-pub mod copy_circuit;
-pub mod evm_circuit;
-pub mod exp_circuit;
-pub mod keccak_circuit;
-pub mod table;
+pub(crate) mod circuit_tools;
+pub(crate) mod copy_circuit;
+pub(crate) mod evm_circuit;
+pub(crate) mod exp_circuit;
+pub(crate) mod keccak_circuit;
+pub(crate) mod table;
 
-#[cfg(any(test, feature = "test-util"))]
-pub mod test_util;
+pub(crate) mod instance;
+pub(crate) mod util;
+pub(crate) mod witness;
 
-pub mod instance;
-pub mod util;
-pub mod witness;
-
-pub use gadgets::impl_expr;
+pub(crate) use gadgets::impl_expr;
