@@ -3,28 +3,38 @@ use eth_types::Field;
 use halo2_proofs::{dev::MockProver, halo2curves::bn256::Fr};
 use log::error;
 use std::iter::zip;
-use halo2_proofs::halo2curves::bn256::Bn256;
-use halo2_proofs::plonk::{keygen_vk};
-use halo2_proofs::poly::kzg::commitment::ParamsKZG;
+use halo2_proofs::halo2curves::bn256::{Bn256, G1Affine};
+use halo2_proofs::plonk::{create_proof, keygen_pk, keygen_vk};
+use halo2_proofs::poly::commitment::Prover;
+use halo2_proofs::poly::kzg::commitment::{KZGCommitmentScheme, ParamsKZG};
+use halo2_proofs::poly::kzg::multiopen::ProverGWC;
+use halo2_proofs::transcript::{Blake2bWrite, Challenge255, TranscriptWriterBuffer};
 use rand::SeedableRng;
 use rand_chacha::ChaCha20Rng;
 
 use super::util::{target_part_sizes, target_part_sizes_rot, WordParts};
 
 #[allow(unused)]
-fn verify<F: Field>(k: u32, inputs: Vec<Vec<u8>>, success: bool) {
+fn verify<F: Field>(k: u32, inputs: Vec<Vec<u8>>) {
     let circuit = KeccakCircuit::new(2usize.pow(k), inputs);
 
-    let prover = MockProver::<F>::run(k, &circuit, vec![]).unwrap();
-    let verify_result = prover.verify();
-    if verify_result.is_ok() != success {
-        if let Some(errors) = verify_result.err() {
-            for error in errors.iter() {
-                error!("{}", error);
-            }
-        }
-        panic!();
-    }
+    let mut rng = ChaCha20Rng::seed_from_u64(0);
+    let params = ParamsKZG::<Bn256>::setup(k, &mut rng);
+
+    let vk = keygen_vk(&params, &circuit).expect("keygen_vk should not fail");
+    let pk = keygen_pk(&params, vk, &circuit).expect("keygen_pk should not fail");
+
+    let mut transcript = Blake2bWrite::<_, _, Challenge255<G1Affine>>::init(vec![]);
+    create_proof::<KZGCommitmentScheme<Bn256>, ProverGWC<'_, Bn256>, _, _, _, _>(
+        &params,
+        &pk,
+        &[circuit],
+        &[&[]],
+        rng,
+        &mut transcript,
+    )
+        .expect("proof generation should not fail");
+    transcript.finalize();
 }
 
 fn keygen_check<F: Field>(k: u32, inputs: Vec<Vec<u8>>) {
@@ -50,8 +60,8 @@ fn packed_multi_keccak_simple() {
         (0u8..136).collect::<Vec<_>>(),
         (0u8..200).collect::<Vec<_>>(),
     ];
-    // verify::<Fr>(k, inputs.clone(), true);
-    keygen_check::<Fr>(k, inputs);
+    verify::<Fr>(k, inputs.clone());
+    // keygen_check::<Fr>(k, inputs);
 }
 
 #[test]

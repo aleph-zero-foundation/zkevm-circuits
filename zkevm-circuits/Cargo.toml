@@ -8,7 +8,7 @@ license = "MIT OR Apache-2.0"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-halo2_proofs = { git = "https://github.com/geometryresearch/halo2.git", features = ["circuit-params"], branch = "pse-mvlookup" }
+halo2_proofs = { git = "https://github.com/geometryresearch/halo2.git", features = ["circuit-params", "counter"], branch = "pse-mvlookup" }
 #halo2_proofs = { git = "https://github.com/privacy-scaling-explorations/halo2.git", tag = "v2023_04_20", features = ["circuit-params"] }
 array-init = "2.0.0"
 bus-mapping = { path = "../bus-mapping" }
