@@ -37,6 +37,7 @@ fn verify<F: Field>(k: u32, inputs: Vec<Vec<u8>>) {
     transcript.finalize();
 }
 
+#[allow(unused)]
 fn keygen_check<F: Field>(k: u32, inputs: Vec<Vec<u8>>) {
     let circuit = KeccakCircuit::new(2usize.pow(k), inputs);
 
