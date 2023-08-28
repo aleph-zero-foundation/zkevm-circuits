@@ -1,7 +1,6 @@
 use super::*;
 use eth_types::Field;
 use halo2_proofs::{dev::MockProver, halo2curves::bn256::Fr};
-use log::error;
 use std::iter::zip;
 use halo2_proofs::halo2curves::bn256::{Bn256, G1Affine};
 use halo2_proofs::plonk::{create_proof, keygen_pk, keygen_vk};

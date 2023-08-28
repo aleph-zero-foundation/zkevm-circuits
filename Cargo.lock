@@ -1218,7 +1218,7 @@ dependencies = [
 [[package]]
 name = "halo2_proofs"
 version = "0.2.0"
-source = "git+https://github.com/geometryresearch/halo2.git?branch=pse-mvlookup#a10c153dcb0ebc944b7c4b7abe910ceac518fcbe"
+source = "git+https://github.com/aleph-zero-foundation/halo2.git?branch=counter#8dde841591d88c5f0ff81721282a3f961240f9ec"
 dependencies = [
  "blake2b_simd",
  "ff",
@@ -1234,11 +1234,9 @@ dependencies = [
 
 [[package]]
 name = "halo2curves"
-version = "0.1.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e6b1142bd1059aacde1b477e0c80c142910f1ceae67fc619311d6a17428007ab"
+version = "0.3.2"
+source = "git+https://github.com/privacy-scaling-explorations/halo2curves?tag=0.3.2#9f5c50810bbefe779ee5cf1d852b2fe85dc35d5e"
 dependencies = [
- "blake2b_simd",
  "ff",
  "group",
  "lazy_static",
