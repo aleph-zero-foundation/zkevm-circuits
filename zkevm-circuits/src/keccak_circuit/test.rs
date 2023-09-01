@@ -2,9 +2,9 @@ use super::*;
 use eth_types::Field;
 use halo2_proofs::{dev::MockProver, halo2curves::bn256::Fr};
 use std::iter::zip;
+use std::time::{Instant};
 use halo2_proofs::halo2curves::bn256::{Bn256, G1Affine};
 use halo2_proofs::plonk::{create_proof, keygen_pk, keygen_vk};
-use halo2_proofs::poly::commitment::Prover;
 use halo2_proofs::poly::kzg::commitment::{KZGCommitmentScheme, ParamsKZG};
 use halo2_proofs::poly::kzg::multiopen::ProverGWC;
 use halo2_proofs::transcript::{Blake2bWrite, Challenge255, TranscriptWriterBuffer};
@@ -20,10 +20,16 @@ fn verify<F: Field>(k: u32, inputs: Vec<Vec<u8>>) {
     let mut rng = ChaCha20Rng::seed_from_u64(0);
     let params = ParamsKZG::<Bn256>::setup(k, &mut rng);
 
+    let now = Instant::now();
+
     let vk = keygen_vk(&params, &circuit).expect("keygen_vk should not fail");
     let pk = keygen_pk(&params, vk, &circuit).expect("keygen_pk should not fail");
 
     let mut transcript = Blake2bWrite::<_, _, Challenge255<G1Affine>>::init(vec![]);
+
+    let elapsed = now.elapsed();
+    println!("Key and transcript generation took: {}s", elapsed.as_secs());
+
     create_proof::<KZGCommitmentScheme<Bn256>, ProverGWC<'_, Bn256>, _, _, _, _>(
         &params,
         &pk,
@@ -31,23 +37,14 @@ fn verify<F: Field>(k: u32, inputs: Vec<Vec<u8>>) {
         &[&[]],
         rng,
         &mut transcript,
+        &now,
     )
         .expect("proof generation should not fail");
+
     transcript.finalize();
-}
 
-#[allow(unused)]
-fn keygen_check<F: Field>(k: u32, inputs: Vec<Vec<u8>>) {
-    let circuit = KeccakCircuit::new(2usize.pow(k), inputs);
-
-    let mut rng = ChaCha20Rng::seed_from_u64(0);
-    // todo: assert that degree === k
-    let general_params = ParamsKZG::<Bn256>::setup(k, &mut rng);
-
-    let vk = keygen_vk(&general_params, &circuit).expect("keygen_vk should not fail");
-
-    println!("LOOKUPS: {}", vk.cs().lookups().len());
-    println!("COLUMNS: {}", vk.cs().num_advice_columns() + vk.cs().num_instance_columns() + vk.cs().num_fixed_columns());
+    let elapsed = now.elapsed();
+    println!("The whole procedure took: {}s", elapsed.as_secs());
 }
 
 #[test]
@@ -61,7 +58,6 @@ fn packed_multi_keccak_simple() {
         (0u8..200).collect::<Vec<_>>(),
     ];
     verify::<Fr>(k, inputs.clone());
-    // keygen_check::<Fr>(k, inputs);
 }
 
 #[test]
