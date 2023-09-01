@@ -9,7 +9,7 @@ license = "MIT OR Apache-2.0"
 #halo2_proofs = { git = "https://github.com/geometryresearch/halo2.git", branch = "pse-mvlookup" }
 #halo2_proofs = { git = "https://github.com/privacy-scaling-explorations/halo2.git", tag = "v2023_04_20" }
 #halo2_proofs = { git = "https://github.com/aleph-zero-foundation/halo2.git", branch = "pse-mvlookup" }
-halo2_proofs = { git = "https://github.com/aleph-zero-foundation/halo2.git", branch = "counter" }
+halo2_proofs = { git = "https://github.com/aleph-zero-foundation/halo2.git", branch = "halo2-lookup" }
 eth-types = { path = "../eth-types" }
 strum = "0.24"
 

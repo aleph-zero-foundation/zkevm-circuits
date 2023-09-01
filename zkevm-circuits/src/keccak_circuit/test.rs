@@ -28,7 +28,7 @@ fn verify<F: Field>(k: u32, inputs: Vec<Vec<u8>>) {
     let mut transcript = Blake2bWrite::<_, _, Challenge255<G1Affine>>::init(vec![]);
 
     let elapsed = now.elapsed();
-    println!("Key and transcript generation took: {}s", elapsed.as_secs());
+    println!("Key and transcript generation took: {}ms", elapsed.as_millis());
 
     create_proof::<KZGCommitmentScheme<Bn256>, ProverGWC<'_, Bn256>, _, _, _, _>(
         &params,
@@ -44,11 +44,13 @@ fn verify<F: Field>(k: u32, inputs: Vec<Vec<u8>>) {
     transcript.finalize();
 
     let elapsed = now.elapsed();
-    println!("The whole procedure took: {}s", elapsed.as_secs());
+    println!("The whole procedure took: {}ms", elapsed.as_millis());
 }
 
 #[test]
 fn packed_multi_keccak_simple() {
+    println!("Using {} rows per round", get_num_rows_per_round());
+
     let k = 15;
     let inputs = vec![
         vec![],

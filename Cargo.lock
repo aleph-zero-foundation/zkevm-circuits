@@ -1218,7 +1218,7 @@ dependencies = [
 [[package]]
 name = "halo2_proofs"
 version = "0.2.0"
-source = "git+https://github.com/aleph-zero-foundation/halo2.git?branch=counter#c8b14095f6eaf2d9114315f152a5dae46c01ebde"
+source = "git+https://github.com/aleph-zero-foundation/halo2.git?branch=halo2-lookup#55ec77e3b66f49ff4ee6e69406c2b98a910222b0"
 dependencies = [
  "blake2b_simd",
  "ff",

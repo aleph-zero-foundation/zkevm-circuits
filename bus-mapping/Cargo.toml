@@ -15,7 +15,7 @@ ethers-providers = "2.0.7"
 #halo2_proofs = { git = "https://github.com/geometryresearch/halo2.git", branch = "pse-mvlookup" }
 #halo2_proofs = { git = "https://github.com/privacy-scaling-explorations/halo2.git", tag = "v2023_04_20" }
 #halo2_proofs = { git = "https://github.com/aleph-zero-foundation/halo2.git", branch = "pse-mvlookup" }
-halo2_proofs = { git = "https://github.com/aleph-zero-foundation/halo2.git", branch = "counter" }
+halo2_proofs = { git = "https://github.com/aleph-zero-foundation/halo2.git", branch = "halo2-lookup" }
 itertools = "0.10"
 lazy_static = "1.4"
 log = "0.4.14"
