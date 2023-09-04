@@ -10,7 +10,7 @@ license = "MIT OR Apache-2.0"
 [dependencies]
 halo2_proofs = { git = "https://github.com/aleph-zero-foundation/halo2.git", features = ["circuit-params", "counter"], branch = "pse-mvlookup" }
 array-init = "2.0.0"
-bus-mapping = { path = "../bus-mapping" }
+bus-mapping = { path = "../bus-mapping", features = ["test"] }
 eth-types = { path = "../eth-types" }
 gadgets = { path = "../gadgets" }
 ethers-core = "2.0.7"
@@ -22,11 +22,14 @@ log = "0.4"
 cli-table = { version = "0.4", optional = true }
 serde = { version = "1.0.130", features = ["derive"] }
 
-[dev-dependencies]
-bus-mapping = { path = "../bus-mapping", features = ["test"] }
-itertools = "0.10.1"
 rand = "0.8"
 rand_chacha = "0.3"
 
+criterion = "0.5.1"
+
 [features]
 default = []
+
+[[bench]]
+name = "prover"
+harness = false

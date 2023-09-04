@@ -6,7 +6,7 @@ mod table;
 /// Util
 mod util;
 
-#[cfg(any(test, feature = "test-circuits"))]
+// #[cfg(any(test, feature = "test-circuits"))]
 mod dev;
 #[cfg(test)]
 mod test;
