@@ -1,0 +1,68 @@
+Using 12 rows per round
+Key and transcript generation took: 3279ms
+MSM_COUNTER: {32768: 332}
+FFT_COUNTER: {32768: 327, 131072: 328}
+Second phase reached after: 68094ms
+The whole procedure took: 95451ms
+Using 12 rows per round
+Key and transcript generation took: 3254ms
+MSM_COUNTER: {32768: 332}
+FFT_COUNTER: {32768: 327, 131072: 328}
+Second phase reached after: 66208ms
+The whole procedure took: 94103ms
+Using 12 rows per round
+Key and transcript generation took: 3333ms
+MSM_COUNTER: {32768: 332}
+FFT_COUNTER: {32768: 327, 131072: 328}
+Second phase reached after: 66237ms
+The whole procedure took: 94214ms
+Using 12 rows per round
+Key and transcript generation took: 3307ms
+MSM_COUNTER: {32768: 332}
+FFT_COUNTER: {32768: 327, 131072: 328}
+Second phase reached after: 67594ms
+The whole procedure took: 95217ms
+Using 12 rows per round
+Key and transcript generation took: 3446ms
+MSM_COUNTER: {32768: 332}
+FFT_COUNTER: {32768: 327, 131072: 328}
+Second phase reached after: 67448ms
+The whole procedure took: 95725ms
+Using 12 rows per round
+Key and transcript generation took: 3272ms
+MSM_COUNTER: {32768: 332}
+FFT_COUNTER: {32768: 327, 131072: 328}
+Second phase reached after: 68522ms
+The whole procedure took: 96689ms
+Using 12 rows per round
+Key and transcript generation took: 3474ms
+MSM_COUNTER: {32768: 332}
+FFT_COUNTER: {32768: 327, 131072: 328}
+Second phase reached after: 68478ms
+The whole procedure took: 96543ms
+Using 12 rows per round
+Key and transcript generation took: 3328ms
+MSM_COUNTER: {32768: 332}
+FFT_COUNTER: {32768: 327, 131072: 328}
+Second phase reached after: 68137ms
+The whole procedure took: 95457ms
+Using 12 rows per round
+Key and transcript generation took: 3431ms
+MSM_COUNTER: {32768: 332}
+FFT_COUNTER: {32768: 327, 131072: 328}
+Second phase reached after: 68981ms
+The whole procedure took: 96441ms
+Using 12 rows per round
+Key and transcript generation took: 3344ms
+MSM_COUNTER: {32768: 332}
+FFT_COUNTER: {32768: 327, 131072: 328}
+Second phase reached after: 68602ms
+The whole procedure took: 95819ms
+
+====================
+MSM_COUNTER: {32768: 332}
+FFT_COUNTER: {32768: 327, 131072: 328}
+
+key_generation: 3346.8ms
+second phase reached after: 67830.1ms
+whole process: 95565.9ms

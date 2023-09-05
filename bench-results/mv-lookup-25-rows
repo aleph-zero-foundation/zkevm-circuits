@@ -1,0 +1,68 @@
+Using 25 rows per round
+Key and transcript generation took: 2770ms
+MSM_COUNTER: {32768: 179}
+FFT_COUNTER: {32768: 174, 131072: 175}
+Second phase reached after: 41966ms
+The whole procedure took: 77023ms
+Using 25 rows per round
+Key and transcript generation took: 2801ms
+MSM_COUNTER: {32768: 179}
+FFT_COUNTER: {32768: 174, 131072: 175}
+Second phase reached after: 42454ms
+The whole procedure took: 76880ms
+Using 25 rows per round
+Key and transcript generation took: 2812ms
+MSM_COUNTER: {32768: 179}
+FFT_COUNTER: {32768: 174, 131072: 175}
+Second phase reached after: 45108ms
+The whole procedure took: 81063ms
+Using 25 rows per round
+Key and transcript generation took: 3026ms
+MSM_COUNTER: {32768: 179}
+FFT_COUNTER: {32768: 174, 131072: 175}
+Second phase reached after: 41539ms
+The whole procedure took: 77270ms
+Using 25 rows per round
+Key and transcript generation took: 2696ms
+MSM_COUNTER: {32768: 179}
+FFT_COUNTER: {32768: 174, 131072: 175}
+Second phase reached after: 41660ms                                                                                                                                          The whole procedure took: 76255ms
+The whole procedure took: 76340ms
+Using 25 rows per round
+Key and transcript generation took: 2813ms
+MSM_COUNTER: {32768: 179}
+FFT_COUNTER: {32768: 174, 131072: 175}
+Second phase reached after: 41022ms
+The whole procedure took: 75587ms
+Using 25 rows per round
+Key and transcript generation took: 2783ms
+MSM_COUNTER: {32768: 179}
+FFT_COUNTER: {32768: 174, 131072: 175}
+Second phase reached after: 41876ms
+The whole procedure took: 77135ms
+Using 25 rows per round
+Key and transcript generation took: 2753ms
+MSM_COUNTER: {32768: 179}
+FFT_COUNTER: {32768: 174, 131072: 175}
+Second phase reached after: 41739ms
+The whole procedure took: 76520ms
+Using 25 rows per round
+Key and transcript generation took: 2778ms
+MSM_COUNTER: {32768: 179}
+FFT_COUNTER: {32768: 174, 131072: 175}
+Second phase reached after: 41817ms
+The whole procedure took: 76745ms
+Using 25 rows per round
+Key and transcript generation took: 2934ms
+MSM_COUNTER: {32768: 179}
+FFT_COUNTER: {32768: 174, 131072: 175}
+Second phase reached after: 42135ms
+The whole procedure took: 76504ms
+
+====================
+MSM_COUNTER: {32768: 179}
+FFT_COUNTER: {32768: 174, 131072: 175}
+
+key_generation: 2816.6ms
+second phase reached after: 42131.6ms
+whole process: 77106.7ms
